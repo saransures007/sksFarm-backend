@@ -19,6 +19,7 @@ const summaryFarmExpense = async (model, req, res) => {
     // Time Boundaries using startOf
     const startOfWeek = dayjs().tz(istTimeZone).startOf('week').toDate();
     const startOfMonth = dayjs().tz(istTimeZone).startOf('month').toDate();
+    const startOfPreviousMonth = dayjs().tz(istTimeZone).subtract(1, "month").startOf("month").toDate();
     const startOfYear = dayjs().tz(istTimeZone).startOf('year').toDate();
     
     // Helper function to aggregate expenses
@@ -47,7 +48,7 @@ const summaryFarmExpense = async (model, req, res) => {
     // Function to calculate average cost per unit for feed inventory
     const getAverageCostPerUnit = async () => {
       const inventory = await feedInventoryModel.aggregate([
-        { $match: { date: { $gte: startOfMonth } } },
+        { $match: { date: { $gte: startOfPreviousMonth } } },
         {
           $group: {
             _id: "$feedType",
