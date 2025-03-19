@@ -14,12 +14,15 @@ router.route('/automation/run/createTotalMilkProduction').post(async function (r
     // const { entryDate, totalMilk, avgSnf, avgFat, ratePerLiter, addedBy } = req.body.message;
 
     console.log("Received request:", req.body.message);
+        // Convert message into a single line
+        const message = req.body.message.replace(/\n/g, " ");
+
     const regex = /(\d{2}-\d{2}-\d{4})\/([EM]) Qty\(Ltrs\):([\d.]+) Fat%:([\d.]+) Snf%:([\d.]+) Rate:([\d.]+)\/Lt/;
-    const match = req.body.message.match(regex);
+    const match = message.match(regex);
 
     const requestEntry = new RequestTracking({
       requestType: 'CREATE',
-      requestData: req.body.message,
+      requestData: message,
       status: 'CREATING',
       responseMessage: 'req success',
       lastUpdated: Date.now(),
