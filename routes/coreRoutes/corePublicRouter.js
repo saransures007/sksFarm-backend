@@ -1,24 +1,57 @@
 const express = require('express');
-
+const moment = require('moment');
 const router = express.Router();
 const path = require('path')
 const mongoose = require('mongoose');
 const RequestTracking = mongoose.model('requestTracking');
+const TotalMilkProduction = mongoose.model('totalMilkProduction');
 // Without middleware
 // New Automation API Routes
 
 // ✅ New Automation API Route (Fixes await issue)
 router.route('/automation/run/createTotalMilkProduction').post(async function (req, res) {
   try {
-    const { entryDate, totalMilk, avgSnf, avgFat, ratePerLiter, addedBy } = req.body;
+    // const { entryDate, totalMilk, avgSnf, avgFat, ratePerLiter, addedBy } = req.body.message;
 
-    console.log("Received request:", req.body);
+    console.log("Received request:", req.body.message);
+    const regex = /(\d{2}-\d{2}-\d{4})\/([EM]) Qty\(Ltrs\):([\d.]+) Fat%:([\d.]+) Snf%:([\d.]+) Rate:([\d.]+)\/Lt/;
+    const match = req.body.message.match(regex);
 
+    if (!match) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid message format.',
+      });
+    }
+
+    console.log("match", match)
+
+    // Parse extracted data
+    const [ data,date, session, totalMilk, avgFat, avgSnf, ratePerLiter] = match;
+  // Determine the correct time based on session
+      const time = session === 'E' ? '20:00:00' : '10:00:00';
+      console.log("date",date);
+      console.log(time);
+      // Format entryDate in ISO format
+      const entryDate = moment(`${date} ${time}`, 'DD-MM-YYYY HH:mm:ss').toISOString();
+      console.log(entryDate);
+    console.log(entryDate,session, totalMilk, avgFat, avgSnf, ratePerLiter);
     // ✅ Validate required fields
-    if (!entryDate || !totalMilk || !avgSnf || !avgFat || !ratePerLiter || !addedBy) {
+    if (!entryDate || !totalMilk || !avgSnf || !avgFat || !ratePerLiter ) {
       return res.status(400).json({
         success: false,
         message: 'All fields are required.',
+      });
+    }
+
+
+    // ✅ Check if an entry already exists for the same date and time
+    const existingEntry = await TotalMilkProduction.findOne({ entryDate });
+
+    if (existingEntry) {
+      return res.status(400).json({
+        success: false,
+        message: 'An entry already exists for the given date and time.',
       });
     }
 
@@ -29,7 +62,7 @@ router.route('/automation/run/createTotalMilkProduction').post(async function (r
       avgSnf,
       avgFat,
       ratePerLiter,
-      addedBy,
+      addedBy:"automation",
       lastUpdated: Date.now(),
     });
 
