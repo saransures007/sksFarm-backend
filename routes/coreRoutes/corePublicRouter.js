@@ -28,6 +28,15 @@ router.route('/automation/run/createTotalMilkProduction').post(async function (r
     await requestEntry.save();
     
     if (!match) {
+      const requestEntry2 = new RequestTracking({
+        requestType: 'CREATE',
+        requestData: match,
+        status: 'INVALID FORMAT',
+        responseMessage: 'req failed',
+        lastUpdated: Date.now(),
+      });
+  
+      await requestEntry2.save();
       return res.status(400).json({
         success: false,
         message: 'Invalid message format.',
@@ -35,6 +44,15 @@ router.route('/automation/run/createTotalMilkProduction').post(async function (r
     }
 
     console.log("match", match)
+    const requestEntry3 = new RequestTracking({
+      requestType: 'CREATE',
+      requestData: match,
+      status: 'MATCH',
+      responseMessage: 'req MATCHED',
+      lastUpdated: Date.now(),
+    });
+
+    await requestEntry3.save();
 
     // Parse extracted data
     const [ data,date, session, totalMilk, avgFat, avgSnf, ratePerLiter] = match;
