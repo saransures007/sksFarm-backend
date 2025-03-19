@@ -17,13 +17,42 @@ router.route('/automation/run/createTotalMilkProduction').post(async function (r
     const regex = /(\d{2}-\d{2}-\d{4})\/([EM]) Qty\(Ltrs\):([\d.]+) Fat%:([\d.]+) Snf%:([\d.]+) Rate:([\d.]+)\/Lt/;
     const match = req.body.message.match(regex);
 
+    const requestEntry = new RequestTracking({
+      requestType: 'Requested',
+      requestData: req.body.message,
+      status: 'CREATING',
+      responseMessage: 'req success',
+      lastUpdated: Date.now(),
+    });
+
+    await requestEntry.save();
+    
     if (!match) {
+       requestEntry = new RequestTracking({
+        requestType: 'CREATE',
+        requestData: match,
+        status: 'INVALID FORMAT',
+        responseMessage: 'failed run test',
+        lastUpdated: Date.now(),
+      });
+  
+      await requestEntry.save();
       return res.status(400).json({
         success: false,
         message: 'Invalid message format.',
       });
     }
 
+
+     requestEntry = new RequestTracking({
+      requestType: 'MATCH',
+      requestData: match,
+      status: 'MATCH FORMAT',
+      responseMessage: ' running',
+      lastUpdated: Date.now(),
+    });
+
+    await requestEntry.save();
     console.log("match", match)
 
     // Parse extracted data
@@ -67,7 +96,7 @@ router.route('/automation/run/createTotalMilkProduction').post(async function (r
     });
 
     // Save request data in the database
-    const requestEntry = new RequestTracking({
+     requestEntry = new RequestTracking({
       requestType: 'CREATE',
       requestData: {
         entryDate,
