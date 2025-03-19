@@ -2,7 +2,8 @@ const express = require('express');
 
 const router = express.Router();
 const path = require('path')
-
+const mongoose = require('mongoose');
+const RequestTracking = mongoose.model('requestTracking');
 // Without middleware
 // New Automation API Routes
 
@@ -32,6 +33,8 @@ router.route('/automation/run/createTotalMilkProduction').post(async function (r
       lastUpdated: Date.now(),
     });
 
+    console.log("newEntry", newEntry)
+
     const result = await newEntry.save();
 
     return res.status(201).json({
@@ -52,6 +55,17 @@ router.route('/automation/run/test').post(async function (req, res) {
   try {
     const { entryDate, totalMilk, avgSnf, avgFat, ratePerLiter, addedBy } = req.body;
     console.log("Received request:", req.body);
+
+    // Save request data in the database
+    const requestEntry = new RequestTracking({
+      requestType: 'CREATE',
+      requestData: req.body,
+      status: 'SUCCESS',
+      responseMessage: 'Successfully run test',
+      lastUpdated: Date.now(),
+    });
+
+    await requestEntry.save();
 
     return res.status(201).json({
       success: true,
