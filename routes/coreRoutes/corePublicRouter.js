@@ -19,13 +19,23 @@ router.route('/automation/run/createTotalMilkProduction').post(async function (r
 
     const requestEntry = new RequestTracking({
       requestType: 'CREATE',
-      requestData: match,
+      requestData: req.body.message,
       status: 'CREATING',
       responseMessage: 'req success',
       lastUpdated: Date.now(),
     });
 
     await requestEntry.save();
+
+    const requestEntry4 = new RequestTracking({
+      requestType: 'CREATE',
+      requestData: match,
+      status: 'CREATING',
+      responseMessage: 'req success',
+      lastUpdated: Date.now(),
+    });
+
+    await requestEntry4.save();
     
     if (!match) {
       const requestEntry2 = new RequestTracking({
