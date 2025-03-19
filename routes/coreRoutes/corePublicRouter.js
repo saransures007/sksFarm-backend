@@ -38,7 +38,7 @@ router.route('/automation/run/createTotalMilkProduction').post(async function (r
     // Parse extracted data
     const [ data,date, session, totalMilk, avgFat, avgSnf, ratePerLiter] = match;
   // Determine the correct time based on session
-      const time = session === 'E' ? '20:00:00' : '10:00:00';
+      const time = session === 'E' ? '15:00:00' : '05:00:00';
       console.log("date",date);
       console.log(time);
       // Format entryDate in ISO format
