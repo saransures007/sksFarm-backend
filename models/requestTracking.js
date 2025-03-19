@@ -15,7 +15,7 @@ const requestTrackingSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['PENDING', 'SUCCESS', 'FAILED'],
+    enum: ['PENDING', 'SUCCESS', 'FAILED', 'CREATING', 'INVALID FORMAT', 'MATCH'],
     default: 'PENDING',
   },
   responseMessage: {
