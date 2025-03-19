@@ -1,9 +1,72 @@
 const express = require('express');
 
 const router = express.Router();
-const path = require('path');
+const path = require('path')
 
 // Without middleware
+// New Automation API Routes
+
+// ✅ New Automation API Route (Fixes await issue)
+router.route('/automation/run/createTotalMilkProduction').post(async function (req, res) {
+  try {
+    const { entryDate, totalMilk, avgSnf, avgFat, ratePerLiter, addedBy } = req.body;
+
+    console.log("Received request:", req.body);
+
+    // ✅ Validate required fields
+    if (!entryDate || !totalMilk || !avgSnf || !avgFat || !ratePerLiter || !addedBy) {
+      return res.status(400).json({
+        success: false,
+        message: 'All fields are required.',
+      });
+    }
+
+    // ✅ Create and Save Entry
+    const newEntry = new TotalMilkProduction({
+      entryDate,
+      totalMilk,
+      avgSnf,
+      avgFat,
+      ratePerLiter,
+      addedBy,
+      lastUpdated: Date.now(),
+    });
+
+    const result = await newEntry.save();
+
+    return res.status(201).json({
+      success: true,
+      result,
+      message: 'Successfully created Total Milk Production entry.',
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Error creating entry: ' + error.message,
+    });
+  }
+});
+
+router.route('/automation/run/test').post(async function (req, res) {
+  try {
+    const { entryDate, totalMilk, avgSnf, avgFat, ratePerLiter, addedBy } = req.body;
+    console.log("Received request:", req.body);
+
+    return res.status(201).json({
+      success: true,
+      body:req.body,
+      message: 'Successfully  run test',
+    });
+
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Error creating entry: ' + error.message,
+    });
+  }
+});
 
 router.route('/:subPath/:directory/:file').get(function (req, res) {
   try {
