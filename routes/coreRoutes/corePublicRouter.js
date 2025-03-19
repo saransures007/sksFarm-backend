@@ -12,16 +12,7 @@ const TotalMilkProduction = mongoose.model('totalMilkProduction');
 router.route('/automation/run/createTotalMilkProduction').post(async function (req, res) {
   try {
     // const { entryDate, totalMilk, avgSnf, avgFat, ratePerLiter, addedBy } = req.body.message;
-// Save request data in the database
-    const requestEntry = new RequestTracking({
-      requestType: 'CREATE',
-      requestData: req.body,
-      status: 'SUCCESS',
-      responseMessage: 'Successfully run test',
-      lastUpdated: Date.now(),
-    });
 
-    await requestEntry.save();
     console.log("Received request:", req.body.message);
     const regex = /(\d{2}-\d{2}-\d{4})\/([EM]) Qty\(Ltrs\):([\d.]+) Fat%:([\d.]+) Snf%:([\d.]+) Rate:([\d.]+)\/Lt/;
     const match = req.body.message.match(regex);
@@ -74,6 +65,25 @@ router.route('/automation/run/createTotalMilkProduction').post(async function (r
       addedBy:"automation",
       lastUpdated: Date.now(),
     });
+
+    // Save request data in the database
+    const requestEntry = new RequestTracking({
+      requestType: 'CREATE',
+      requestData: {
+        entryDate,
+        totalMilk,
+        avgSnf,
+        avgFat,
+        ratePerLiter,
+        addedBy:"automation",
+        lastUpdated: Date.now(),
+      },
+      status: 'SUCCESS',
+      responseMessage: 'Successfully run test',
+      lastUpdated: Date.now(),
+    });
+
+    await requestEntry.save();
 
     console.log("newEntry", newEntry)
 
