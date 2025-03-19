@@ -18,7 +18,7 @@ router.route('/automation/run/createTotalMilkProduction').post(async function (r
     const match = req.body.message.match(regex);
 
     const requestEntry = new RequestTracking({
-      requestType: 'Requested',
+      requestType: 'CREATE',
       requestData: req.body.message,
       status: 'CREATING',
       responseMessage: 'req success',
@@ -45,7 +45,7 @@ router.route('/automation/run/createTotalMilkProduction').post(async function (r
 
 
      requestEntry = new RequestTracking({
-      requestType: 'MATCH',
+      requestType: 'CREATE',
       requestData: match,
       status: 'MATCH FORMAT',
       responseMessage: ' running',
