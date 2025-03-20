@@ -3,10 +3,23 @@ const moment = require('moment');
 const router = express.Router();
 const path = require('path')
 const mongoose = require('mongoose');
+const createFeedInventoryUsage = require('../../controllers/appControllers/feedInventoryUsageController/create');
 const RequestTracking = mongoose.model('requestTracking');
 const TotalMilkProduction = mongoose.model('totalMilkProduction');
+const FeedInventoryUsage = mongoose.model('feedInventoryUsage');
 // Without middleware
 // New Automation API Routes
+
+const dummyRes = {
+  status: function (statusCode) {
+    this.statusCode = statusCode;
+    return this;
+  },
+  json: function (data) {
+    this.data = data;
+    return this;
+  },
+};
 
 // ✅ New Automation API Route (Fixes await issue)
 router.route('/automation/run/createTotalMilkProduction').post(async function (req, res) {
@@ -29,6 +42,7 @@ router.route('/automation/run/createTotalMilkProduction').post(async function (r
     });
 
     await requestEntry.save();
+
 
     const requestEntry4 = new RequestTracking({
       requestType: 'CREATE',
@@ -106,11 +120,34 @@ router.route('/automation/run/createTotalMilkProduction').post(async function (r
       addedBy:"automation",
       lastUpdated: Date.now(),
     });
-
-
     console.log("newEntry", newEntry)
 
     const result = await newEntry.save();
+
+    const request = {
+      body: {
+        feedType: "Silage", // Corrected capitalization
+        quantityUsed: req.body.silage,
+        date: entryDate,
+        addedBy: "automation"
+      }
+    };
+    
+    const request2 = {
+      body: {
+        feedType: "TMR Feed", // Corrected capitalization
+        quantityUsed: req.body.tmr,
+        date: entryDate,
+        addedBy: "automation"
+      }
+    };
+    
+    // Assuming no `res`, modify function accordingly
+    const result1 = await createFeedInventoryUsage(FeedInventoryUsage, request, dummyRes);
+    const result2 = await createFeedInventoryUsage(FeedInventoryUsage, request2, dummyRes);
+    console.log(result1, result2);
+
+
 
     return res.status(201).json({
       success: true,
