@@ -141,11 +141,14 @@ router.route('/automation/run/createTotalMilkProduction').post(async function (r
         addedBy: "automation"
       }
     };
+
+    if(session === 'M'){
+        // Assuming no `res`, modify function accordingly
+        const result1 = await createFeedInventoryUsage(FeedInventoryUsage, request, dummyRes);
+        const result2 = await createFeedInventoryUsage(FeedInventoryUsage, request2, dummyRes);
+        console.log(result1, result2);
+    }
     
-    // Assuming no `res`, modify function accordingly
-    const result1 = await createFeedInventoryUsage(FeedInventoryUsage, request, dummyRes);
-    const result2 = await createFeedInventoryUsage(FeedInventoryUsage, request2, dummyRes);
-    console.log(result1, result2);
 
 
 
